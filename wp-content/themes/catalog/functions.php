@@ -55,3 +55,5 @@ require_once( 'library/responsive-images.php' );
 // require_once( 'library/class-foundationpress-protocol-relative-theme-assets.php' );
 
 require_once( 'library/user-management.php' );
+
+require_once( 'library/catalog-core-functions.php' );
