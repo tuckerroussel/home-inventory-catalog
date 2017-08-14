@@ -16,7 +16,7 @@ function create_catalog_db_table() {
 		  details longtext DEFAULT '' NOT NULL,
 		  category text NOT NULL,
 		  purchase_price decimal(6,2) DEFAULT 0.00 NOT NULL,
-		  time_of_purchase datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+		  purchase_date date DEFAULT '0000-00-00' NOT NULL,
 		  photo varchar(200) DEFAULT '' NOT NULL,
 		  PRIMARY KEY  (id)
 		) $charset_collate;";
@@ -65,7 +65,7 @@ class CatalogItem {
   var $details;
   var $purchase_price;
   var $category;
-  var $time_of_purchase;
+  var $purchase_date;
   var $photo;
 
   //-----------------------------------------------------
@@ -99,13 +99,13 @@ class CatalogItem {
 	/*
 	* Constructor, provided all member variables
 	*/
-  function __construct7( $userID, $name, $details, $purchase_price, $category, $time_of_purchase, $photo ) {
+  function __construct7( $userID, $name, $details, $purchase_price, $purchase_date, $category, $photo ) {
   	$this->userID = $userID;
   	$this->name = $name;
    	$this->details = $details;
    	$this->purchase_price = $purchase_price;
    	$this->category = $category;
-   	$this->time_of_purchase = $time_of_purchase;
+   	$this->purchase_date = $purchase_date;
    	$this->photo = $photo;
 	}
 
@@ -133,15 +133,114 @@ class CatalogItem {
 	//-----------------------------------------------------
 
 	// Add the CategoryItem object to the database
-	function addCategoryItem() {
+	function addToDatabase() {
+		global $wpdb;
+  	$table_name = $wpdb->prefix . "catalog_items";
+
 		// grab the objects member variables and create a row in the DB table with those values
-		return true;
+		return $wpdb->insert(
+			$table_name,
+			array(
+				'userID' 					=> $this->userID,
+				'name' 						=> $this->name,
+				'details' 				=> $this->details,
+				'purchase_price' 	=> $this->purchase_price,
+				'purchase_date' 	=> $this->purchase_date,
+				'category' 				=> $this->category,
+				'photo' 					=> $this->photo
+			),
+			array(
+				'%d',
+				'%s',
+				'%s',
+				'%f',
+				'%s',
+				'%s',
+				'%s',
+			)
+		);
 	}
 
 
 	// Update the corresponding database row with the CategoryItem's values
-	function updateCategoryItem() {
+	function updateDatabaseEntry() {
 		// grab the objects member variables and update the corresponding row in the DB table with those values
 		return true;
 	}
 }
+
+function getItems() {
+	global $wpdb;
+	$table_name = $wpdb->prefix . "catalog_items";
+	$currentUserID = get_current_user_id();
+	$items = $wpdb->get_results(
+		"
+		SELECT *
+		FROM $table_name
+		WHERE userid = $currentUserID
+		"
+	);
+
+	return $items;
+}
+
+function getCategories() {
+	global $wpdb;
+	$table_name = $wpdb->prefix . "catalog_items";
+	$currentUserID = get_current_user_id();
+	$categoriesArray = [];
+	$categories = $wpdb->get_results(
+		"
+		SELECT DISTINCT category
+		FROM $table_name
+		WHERE userid = $currentUserID
+		"
+	);
+
+	foreach ($categories as $category) {
+		array_push($categoriesArray, $category->category);
+	}
+
+	return $categoriesArray;
+}
+
+add_action( 'wp_ajax_nopriv_add_item', 'add_item_processor' );
+add_action( 'wp_ajax_add_item', 'add_item_processor' );
+
+function add_item_processor() {
+	$formError = false;
+	$success = false;
+
+	$userID = get_current_user_id();
+	$name = $_POST['item_name'];
+	if ($name == "") {
+		$formError = "Item name is required";
+	}
+	$details = $_POST['details'];
+	$purchase_price = $_POST['purchase_price'];
+	$purchase_date = $_POST['purchase_date'];
+	$category = $_POST['category'];
+
+  $upload = wp_upload_bits( $_FILES['photo']['name'], null, file_get_contents( $_FILES['photo']['tmp_name'] ) );
+  $photo = $upload['url'];
+
+  if ($formError) {
+  	$message = $formError;
+		wp_redirect( site_url() . '/add-item/?message=' . urlencode($message) . '&type=alert' );
+  } else {
+  	$catalogItem = new CatalogItem($userID, $name, $details, $purchase_price, $purchase_date, $category, $photo);
+		$success = $catalogItem->addToDatabase();
+
+		if ($success) {
+			$message = "Item added successfully.";
+			wp_redirect( site_url() . '/dashboard/?message=' . urlencode($message) . '&type=success' );
+		} else {
+			$message = "There was an issue with your request.";
+			wp_redirect( site_url() . '/add-item/?message=' . urlencode($message) . '&type=alert' );
+		}
+	}
+
+	die();
+}
+
+

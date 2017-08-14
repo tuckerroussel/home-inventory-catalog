@@ -8,6 +8,7 @@ import Foundation from 'foundation-sites';
 // the line below
 //import './lib/foundation-explicit-pieces';
 
-import './lib/demosite';
+import './lib/table-expand';
+import './lib/catalog-items';
 
 $(document).foundation();

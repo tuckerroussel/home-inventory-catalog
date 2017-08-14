@@ -63,4 +63,19 @@ check_permissions();
 	</header>
 
 	<section class="container">
+		<?php if ( isset($_GET['message']) && ($_GET['message'] != "") ) { ?>
+			<div id="messages">
+				<div class="grid-x grid-padding-x grid-container">
+					<div class="cell">
+						<div class="<?php echo $_GET['type']; ?> callout" data-closable="slide-out-right">
+						  <span><?php echo $_GET['message']; ?></span>
+						  <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+						    <span aria-hidden="true">&times;</span>
+						  </button>
+						</div>
+					</div>
+				</div>
+			</div>
+		<?php } ?>
+
 		<?php do_action( 'foundationpress_after_header' );

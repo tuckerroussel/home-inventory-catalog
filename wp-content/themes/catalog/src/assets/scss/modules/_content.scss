@@ -1,3 +1,9 @@
+#messages {
+  .callout {
+    margin-top: 32px;
+  }
+}
+
 .main-wrap {
   @include xy-grid-container;
   @include xy-grid();

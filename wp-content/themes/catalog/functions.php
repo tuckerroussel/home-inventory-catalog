@@ -54,6 +54,7 @@ require_once( 'library/responsive-images.php' );
 /** If your site requires protocol relative url's for theme assets, uncomment the line below */
 // require_once( 'library/class-foundationpress-protocol-relative-theme-assets.php' );
 
+
 require_once( 'library/user-management.php' );
 
 require_once( 'library/catalog-core-functions.php' );

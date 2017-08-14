@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 40);
+/******/ 	return __webpack_require__(__webpack_require__.s = 41);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -14239,6 +14239,8 @@ var _foundationSites = __webpack_require__(21);
 
 var _foundationSites2 = _interopRequireDefault(_foundationSites);
 
+__webpack_require__(40);
+
 __webpack_require__(39);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -22002,25 +22004,33 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 "use strict";
 
 
-var _jquery = __webpack_require__(0);
+$(document).ready(function () {
+  $('[data-open="photo-modal"]').click(function (e) {
+    $("#photo-modal").attr('data-url', $(this).attr('data-url'));
+  });
 
-var _jquery2 = _interopRequireDefault(_jquery);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-_jquery2.default.ajax({
-  dataType: 'jsonp',
-  url: 'https://api.github.com/repos/olefredrik/foundationpress?callback=foundationpressGithub&access_token=ed6229228dbc763038dbf1e68d0d8a4a0935b38a',
-  success: function success(response) {
-    if (response && response.data.watchers) {
-      var watchers = (Math.round(response.data.watchers / 100, 10) / 10).toFixed(1);
-      (0, _jquery2.default)('#stargazers a').html(watchers + 'k stargazers');
-    }
-  }
+  $('[data-reveal]#photo-modal').on('open.zf.reveal', function () {
+    $(this).find('.photo-modal-content').html('<img src="' + $(this).attr('data-url') + '" />');
+  });
 });
 
 /***/ }),
 /* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+$(document).ready(function () {
+  $('[data-open-details]').click(function (e) {
+    e.preventDefault();
+    $(this).next().toggleClass('is-active');
+    $(this).toggleClass('is-active');
+  });
+});
+
+/***/ }),
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(20);

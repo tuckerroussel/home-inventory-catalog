@@ -19,7 +19,9 @@ if ( ! function_exists( 'foundationpress_scripts' ) ) :
 	wp_deregister_script( 'jquery' );
 
 	// CDN hosted jQuery placed in the header, as some plugins require that jQuery is loaded in the header.
-	wp_enqueue_script( 'jquery', '//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js', array(), '2.1.0', false );
+	wp_enqueue_script( 'jquery', get_template_directory_uri() . '/dist/assets/jquery.min.js', array(), '2.1.0', false );
+
+	wp_enqueue_script( 'fontawesome', 'https://use.fontawesome.com/215321ce59.js', array(), '1.0', false );
 
 	// Enqueue Founation scripts
 	wp_enqueue_script( 'foundation', get_template_directory_uri() . '/dist/assets/js/app.js', array(), '2.10.2', true );
