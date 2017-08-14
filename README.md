@@ -1,6 +1,6 @@
-# Catalog
+# Home Inventory Catalog
 
-This site was built to allow users to catalog and keep track of their possessions. They can add and manage item details like purchase date, value, warranty info, etc.
+This site was built to allow users to catalog and keep track of their possessions and personal property. They can add and manage item details like purchase date, value, warranty info, etc.
 
 ## Technical Overview
 
