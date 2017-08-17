@@ -94,6 +94,16 @@ class CatalogItem {
   	$this->id = $id;
   	// query database table for the row with the provided id
   	// set remaining member variables based on result
+  	global $wpdb;
+  	$table_name = $wpdb->prefix . "catalog_items";
+
+  	$item = $wpdb->get_row( "SELECT * FROM $table_name WHERE id = $id" );
+  	$this->name = $item->name;
+  	$this->details = $item->details;
+  	$this->category = $item->category;
+  	$this->purchase_price = $item->purchase_price;
+  	$this->purchase_date = $item->purchase_date;
+   	$this->photo = $item->photo;
 	}
 
 	/*
@@ -169,6 +179,26 @@ class CatalogItem {
 	}
 }
 
+
+
+function doesCurrentUserOwnItem($itemID) {
+	global $wpdb;
+	$table_name = $wpdb->prefix . "catalog_items";
+	$itemUserID = (int)$wpdb->get_var(
+		"
+		SELECT userid
+		FROM $table_name
+		WHERE id = $itemID
+		"
+	);
+
+	if (get_current_user_id() == $itemUserID) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 function getItems() {
 	global $wpdb;
 	$table_name = $wpdb->prefix . "catalog_items";
@@ -221,8 +251,17 @@ function add_item_processor() {
 	$purchase_date = $_POST['purchase_date'];
 	$category = $_POST['category'];
 
-  $upload = wp_upload_bits( $_FILES['photo']['name'], null, file_get_contents( $_FILES['photo']['tmp_name'] ) );
-  $photo = $upload['url'];
+  // $upload = wp_upload_bits( $_FILES['photo']['name'], null, file_get_contents( $_FILES['photo']['tmp_name'] ) );
+  $attachment_id = media_handle_upload( 'photo', 0 );
+	if ( is_wp_error( $attachment_id ) ) {
+	  // There was an error uploading the image.
+		echo 'error';
+	} else {
+	  // The image was uploaded successfully!
+		// $photo = $upload['url'];
+		$photo = $attachment_id;
+	}
+
 
   if ($formError) {
   	$message = $formError;
@@ -241,6 +280,61 @@ function add_item_processor() {
 	}
 
 	die();
+}
+
+add_action( 'wp_ajax_nopriv_edit_item', 'edit_item_processor' );
+add_action( 'wp_ajax_edit_item', 'edit_item_processor' );
+
+function edit_item_processor() {
+	$formError = false;
+	$success = false;
+
+	$userID = get_current_user_id();
+	$itemID = $_POST['item_id'];
+	$name = $_POST['item_name'];
+	if ($name == "") {
+		$formError = "Item name is required";
+	}
+	$details = $_POST['details'];
+	$purchase_price = $_POST['purchase_price'];
+	$purchase_date = $_POST['purchase_date'];
+	$category = $_POST['category'];
+
+  // $upload = wp_upload_bits( $_FILES['photo']['name'], null, file_get_contents( $_FILES['photo']['tmp_name'] ) );
+  $attachment_id = media_handle_upload( 'photo', 0 );
+	if ( is_wp_error( $attachment_id ) ) {
+	  // There was an error uploading the image.
+		echo 'error';
+	} else {
+	  // The image was uploaded successfully!
+		// $photo = $upload['url'];
+		$photo = $attachment_id;
+	}
+
+
+  if ($formError) {
+  	$message = $formError;
+		wp_redirect( site_url() . '/edit-item/?id=' . $itemID . '&message=' . urlencode($message) . '&type=alert' );
+  } else {
+  	$catalogItem = new CatalogItem($userID, $name, $details, $purchase_price, $purchase_date, $category, $photo);
+		// $success = $catalogItem->addToDatabase();
+
+		if ($success) {
+			$message = "Changes were saved successfully.";
+			wp_redirect( site_url() . '/dashboard/?message=' . urlencode($message) . '&type=success' );
+		} else {
+			$message = "There was an issue with your request.";
+			wp_redirect( site_url() . '/add-item/?message=' . urlencode($message) . '&type=alert' );
+		}
+	}
+
+	die();
+}
+
+
+function get_item_details($itemID) {
+	$catalogItem = new CatalogItem($itemID);
+	return $catalogItem;
 }
 
 

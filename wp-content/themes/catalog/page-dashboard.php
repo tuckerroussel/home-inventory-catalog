@@ -14,7 +14,7 @@
 
 			<?php $items = getItems();
       if (!empty($items)) { ?>
-        <table class="table-expand">
+        <table class="table-expand hover">
 				  <thead>
 				    <tr class="table-expand-row">
 				      <th>Name</th>
@@ -41,7 +41,7 @@
 					        	<?php if (filter_var($item->photo, FILTER_VALIDATE_URL)) { ?>
 										  <a data-open="photo-modal" data-url="<?php echo $item->photo; ?>" class="button"><i class="fa fa-image"></i> View Image</a>
 										<?php } ?>
-					        	<a href="/edit?id=<?php echo stripcslashes($item->id); ?>" class="button"><i class="fa fa-pencil-square-o"></i> Edit Item</a>
+					        	<a href="/edit-item/?id=<?php echo stripcslashes($item->id); ?>" class="button"><i class="fa fa-pencil-square-o"></i> Edit Item</a>
 					        </div>
 					      </td>
 					    </tr>
